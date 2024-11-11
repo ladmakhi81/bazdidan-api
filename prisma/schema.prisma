@@ -7,7 +7,67 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum UserModel {
+  EstateCompany
+  Client
+  Admin
+}
+
 model User {
-  id   Int    @id @default(autoincrement())
-  name String
+  id               Int               @id @default(autoincrement())
+  firstName        String            @db.VarChar(255)
+  lastName         String            @db.VarChar(255)
+  phone            String            @unique @db.VarChar(11)
+  password         String
+  profileImage     String?
+  bio              String?
+  model            UserModel
+  address          String?
+  advertisingHomes AdvertisingHome[] @relation("AdvertisingHomes")
+  sendMessages     ChatMessage[]     @relation("SenderOfMessage")
+  receivedMessages ChatMessage[]     @relation("ReceiverOfMessage")
+}
+
+model Category {
+  id               Int               @id @default(autoincrement())
+  name             String            @unique
+  image            String
+  advertisingHomes AdvertisingHome[] @relation("AdvertisingHomes")
+}
+
+model AdvertisingHome {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String
+  meta        Json
+  address     String
+  media       String[] @default([])
+  tags        String[] @default([])
+  creator     User     @relation(fields: [creatorId], references: [id], name: "AdvertisingHomes")
+  creatorId   Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now())
+  isPublished Boolean
+  category    Category @relation(fields: [categoryId], references: [id], name: "AdvertisingHomes")
+  categoryId  Int
+  latitude    Float
+  longtitude  Float
+}
+
+model Chat {
+  id Int @id @default(autoincrement())
+}
+
+model ChatMessage {
+  id                   Int          @id @default(autoincrement())
+  sender               User         @relation(fields: [senderId], references: [id], name: "SenderOfMessage")
+  senderId             Int
+  receiver             User         @relation(fields: [receiverId], references: [id], name: "ReceiverOfMessage")
+  receiverId           Int
+  content              String
+  createdAt            DateTime     @default(now())
+  seen                 Boolean      @default(false)
+  repliedMessage       ChatMessage? @relation("RepliedMessage")
+  repliedMessageId     Int?         @unique
+  parentRepliedMessage ChatMessage? @relation("RepliedMessage", fields: [repliedMessageId], references: [id])
 }
