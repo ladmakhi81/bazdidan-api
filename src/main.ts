@@ -4,6 +4,7 @@ import { ApiResponseInterceptor } from './core/interceptors/api-response.interce
 import { ConfigService } from '@nestjs/config';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { ApiExceptionFilter } from './core/filters/api-exception.filter';
 
 const initializeSwagger = (app: INestApplication, isProduction: boolean) => {
   if (isProduction) return;
@@ -28,6 +29,8 @@ const configureApplication = (app: INestApplication) => {
   app.useGlobalPipes(
     new ValidationPipe({ forbidNonWhitelisted: true, stopAtFirstError: true }),
   );
+  app.useGlobalFilters(new ApiExceptionFilter());
+  app.enableCors();
 };
 
 async function bootstrap() {
