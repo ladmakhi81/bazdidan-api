@@ -10,12 +10,16 @@ import { Response } from 'express';
 @Catch()
 export class ApiExceptionFilter implements ExceptionFilter {
   catch(exception: HttpException, host: ArgumentsHost) {
-    const response = host.switchToHttp().getRequest() as Response;
-    response.json({
+    const response = host.switchToHttp().getResponse() as Response;
+    const exceptionResponse = exception?.getResponse() as Record<string, any>;
+    const statusCode =
+      exception.getStatus() || HttpStatus.INTERNAL_SERVER_ERROR;
+
+    response.status(statusCode).json({
       error: true,
-      statusCode: exception.getStatus() || HttpStatus.INTERNAL_SERVER_ERROR,
+      statusCode,
       timestamp: new Date().toISOString(),
-      message: exception.getResponse() ?? 'Internal Server Error',
+      message: exceptionResponse?.message ?? 'Internal Server Error',
     });
   }
 }
