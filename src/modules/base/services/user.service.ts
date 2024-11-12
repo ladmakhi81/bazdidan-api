@@ -4,10 +4,10 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { CreateUserDTO, UpdateUserByIdDTO } from '../dtos/user';
 import { PrismaService } from 'src/core/prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import { UserModel } from '@prisma/client';
+import { CreateUserDTO, UpdateUserByIdDTO } from '../dtos/user';
 import { GetUsersQueryDTO } from '../dtos/user/request/get-users-query.dto';
 
 @Injectable()
@@ -53,7 +53,7 @@ export class UserService {
     }
     if (dto.password) {
       const isPasswordCorrect = await this._checkIsPasswordCorrect(
-        dto.password,
+        dto.currentPassword,
         user.password,
       );
       if (isPasswordCorrect) {
@@ -110,6 +110,18 @@ export class UserService {
       where: this._prepareQueryConditionGetUsersPage(condition),
     });
     return { content, count };
+  }
+
+  async findUserByPhoneAndPassword(phone: string, password: string) {
+    const user = await this._findByPhoneNumber(phone);
+    const isPasswordCorrect = await this._checkIsPasswordCorrect(
+      password,
+      user.password,
+    );
+    if (!isPasswordCorrect) {
+      throw new NotFoundException('شماره تماس یا گذرواژه کاربر نادرست میباشد');
+    }
+    return user;
   }
 
   private async _hashPassword(password: string) {

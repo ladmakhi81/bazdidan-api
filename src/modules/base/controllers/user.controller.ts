@@ -20,7 +20,7 @@ import {
   UserResponseDTO,
 } from '../dtos/user';
 import { Pagination } from 'src/core/decorators/pagination.decorator';
-import { PaginationQuery } from 'src/core/types/pagination.type';
+import { PaginationQuery } from 'src/types/pagination.type';
 import { GetUsersQueryDTO } from '../dtos/user/request/get-users-query.dto';
 
 @Controller('user')

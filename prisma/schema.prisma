@@ -29,6 +29,15 @@ model User {
   receivedMessages         ChatMessage[]     @relation("ReceiverOfMessage")
   createdAt                DateTime          @default(now())
   updatedAt                DateTime          @updatedAt
+  refreshTokens            RefreshToken[]    @relation("RefreshTokens")
+}
+
+model RefreshToken {
+  id               Int    @id @default(autoincrement())
+  accessToken      String
+  refreshTokenCode String
+  userId           Int
+  user             User   @relation(fields: [userId], references: [id], name: "RefreshTokens")
 }
 
 model Category {
