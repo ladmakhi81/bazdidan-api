@@ -1,9 +1,12 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpStatus,
+  Param,
+  ParseIntPipe,
   Post,
   Req,
 } from '@nestjs/common';
@@ -110,5 +113,38 @@ export class AdvertisingHomeController {
   })
   getAdvertisingHomesPage(@Pagination() { limit, page }: PaginationQuery) {
     return this.advertisingHomeService.getAdvertisingHomesPage(page, limit);
+  }
+
+  @Delete(':id')
+  @ApiExtraModels(ApiResponseDTO)
+  @Authentication()
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Delete Advertising Home Successfully',
+    schema: {
+      allOf: [
+        { $ref: getSchemaPath(ApiResponseDTO) },
+        {
+          properties: {
+            data: {
+              $ref: getSchemaPath(AdvertisingHomeResponseDTO),
+            },
+          },
+        },
+      ],
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'No Advertising Home Exist With This Id And Creator',
+  })
+  deleteAdvertisingHomeById(
+    @Param('id', ParseIntPipe) id: number,
+    @Req() request: Express.Request,
+  ) {
+    return this.advertisingHomeService.deleteAdvertisingHomeById(
+      request.user,
+      id,
+    );
   }
 }

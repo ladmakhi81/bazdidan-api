@@ -1,4 +1,8 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateAdvertisingHomeDTO } from '../dtos/advertising-home';
 import { User } from '@prisma/client';
 import { PrismaService } from 'src/core/prisma/prisma.service';
@@ -64,5 +68,33 @@ export class AdvertisingHomeService {
       orderBy: { createdAt: 'desc' },
     });
     return { count, content };
+  }
+
+  async deleteAdvertisingHomeById(creator: User, id: number) {
+    const advertisingHome = await this.findAdvertisingHomeByIdAndCreator(
+      creator.id,
+      id,
+    );
+    return this.prismaService.advertisingHome.delete({
+      where: { id: advertisingHome.id },
+      include: { category: true, creator: true },
+    });
+  }
+
+  private async findAdvertisingHomeByIdAndCreator(
+    creatorId: number,
+    advertisingId: number,
+  ) {
+    const advertisingHome = await this.prismaService.advertisingHome.findFirst({
+      where: {
+        id: advertisingId,
+        creatorId,
+      },
+    });
+
+    if (!advertisingHome) {
+      throw new NotFoundException('آگهی شغلی با این شناسه و سازنده یافت نشد');
+    }
+    return advertisingHome;
   }
 }
