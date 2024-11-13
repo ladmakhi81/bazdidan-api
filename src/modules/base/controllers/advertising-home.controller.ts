@@ -147,4 +147,30 @@ export class AdvertisingHomeController {
       id,
     );
   }
+
+  @Get(':id')
+  @ApiExtraModels(ApiResponseDTO)
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Return Advertising Home By Id',
+    schema: {
+      allOf: [
+        { $ref: getSchemaPath(ApiResponseDTO) },
+        {
+          properties: {
+            data: {
+              $ref: getSchemaPath(AdvertisingHomeResponseDTO),
+            },
+          },
+        },
+      ],
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'No Advertising Home Exist With This Id',
+  })
+  getAdvertisingHomeById(@Param('id', ParseIntPipe) id: number) {
+    return this.advertisingHomeService.getAdvertisingHomeById(id);
+  }
 }

@@ -81,6 +81,16 @@ export class AdvertisingHomeService {
     });
   }
 
+  async getAdvertisingHomeById(id: number) {
+    const advertisingHome = await this.prismaService.advertisingHome.findUnique(
+      { where: { id }, include: { category: true, creator: true } },
+    );
+    if (!advertisingHome) {
+      throw new NotFoundException('آگهی ملکی با این شناسه یافت نشد');
+    }
+    return advertisingHome;
+  }
+
   private async findAdvertisingHomeByIdAndCreator(
     creatorId: number,
     advertisingId: number,
