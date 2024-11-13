@@ -11,7 +11,12 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
-import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiExtraModels,
+  ApiResponse,
+  ApiTags,
+  getSchemaPath,
+} from '@nestjs/swagger';
 import { UserService } from '../services/user.service';
 import {
   CreateUserDTO,
@@ -20,8 +25,10 @@ import {
   UserResponseDTO,
 } from '../dtos/user';
 import { Pagination } from 'src/core/decorators/pagination.decorator';
-import { PaginationQuery } from 'src/types/pagination.type';
+import { PaginationQuery } from 'src/shared/types/pagination.type';
 import { GetUsersQueryDTO } from '../dtos/user/request/get-users-query.dto';
+import { ApiResponseDTO } from 'src/shared/dtos/api-response.dto';
+import { PaginationResponseDTO } from 'src/shared/dtos/pagination-response.dto';
 
 @Controller('user')
 @ApiTags('Users')
@@ -82,11 +89,36 @@ export class UserController {
 
   @Get('/page')
   @HttpCode(HttpStatus.OK)
+  @ApiExtraModels(
+    ApiResponseDTO,
+    PaginationResponseDTO,
+    UserDetailedResponseDTO,
+  )
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Return Users Lists Pagination',
-    type: UserDetailedResponseDTO,
-    isArray: true,
+    schema: {
+      allOf: [
+        { $ref: getSchemaPath(ApiResponseDTO) },
+        {
+          properties: {
+            data: {
+              allOf: [
+                { $ref: getSchemaPath(PaginationResponseDTO) },
+                {
+                  properties: {
+                    content: {
+                      type: 'array',
+                      items: { $ref: getSchemaPath(UserDetailedResponseDTO) },
+                    },
+                  },
+                },
+              ],
+            },
+          },
+        },
+      ],
+    },
   })
   getUsersPage(
     @Query() condition: GetUsersQueryDTO,

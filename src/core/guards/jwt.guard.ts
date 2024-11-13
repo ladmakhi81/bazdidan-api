@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { TokenService } from '../../modules/base/services/token.service';
 import { UserService } from 'src/modules/base/services/user.service';
-import { VerifiedToken } from 'src/types/token.type';
+import { VerifiedToken } from 'src/shared/types/token.type';
 import { Request } from 'express';
 
 @Injectable()
@@ -19,7 +19,10 @@ export class JwtGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest() as Request;
     const tokenHeader = request.header('Authorization');
-    const [bearer, token] = tokenHeader.split(' ');
+    if (!tokenHeader) {
+      throw new UnauthorizedException('ابتدا وارد حساب کاربری خود شوید');
+    }
+    const [bearer, token] = tokenHeader?.split(' ');
     if (!bearer || bearer !== 'Bearer' || !token) {
       throw new UnauthorizedException('توکن کاربر نامعتبر میباشد');
     }

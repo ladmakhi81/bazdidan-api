@@ -11,9 +11,9 @@ import { Response } from 'express';
 export class ApiExceptionFilter implements ExceptionFilter {
   catch(exception: HttpException, host: ArgumentsHost) {
     const response = host.switchToHttp().getResponse() as Response;
-    const exceptionResponse = exception?.getResponse() as Record<string, any>;
+    const exceptionResponse = exception?.getResponse?.() as Record<string, any>;
     const statusCode =
-      exception.getStatus() || HttpStatus.INTERNAL_SERVER_ERROR;
+      exception?.getStatus?.() || HttpStatus.INTERNAL_SERVER_ERROR;
 
     response.status(statusCode).json({
       error: true,
