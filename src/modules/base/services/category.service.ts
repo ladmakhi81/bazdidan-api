@@ -37,22 +37,12 @@ export class CategoryService {
   }
 
   async deleteCategoryById(id: number) {
-    const category = await this.prismaService.category.findUnique({
-      where: { id },
-    });
-    if (!category) {
-      throw new NotFoundException('دسته بندی با این شناسه یافت نشد');
-    }
-    return this.prismaService.category.delete({ where: { id } });
+    const category = await this.getCategoryById(id);
+    return this.prismaService.category.delete({ where: { id: category.id } });
   }
 
   async updateCategoryById(id: number, dto: UpdateCategoryDTO) {
-    const category = await this.prismaService.category.findUnique({
-      where: { id },
-    });
-    if (!category) {
-      throw new NotFoundException('دسته بندی با این شناسه یافت نشد');
-    }
+    const category = await this.getCategoryById(id);
     if (dto.name) {
       const isDuplicateName = await this.prismaService.category.findFirst({
         where: {
@@ -64,7 +54,10 @@ export class CategoryService {
         throw new ConflictException('نام دسته بندی تکراری میباشد');
       }
     }
-    return this.prismaService.category.update({ where: { id }, data: dto });
+    return this.prismaService.category.update({
+      where: { id: category.id },
+      data: dto,
+    });
   }
 
   async uploadCategoryImage(file: Express.Multer.File) {
@@ -81,5 +74,15 @@ export class CategoryService {
     const loadedFile = await Jimp.read(file.buffer);
     await loadedFile.resize({ h: 200, w: 200 }).write(filePathURL as any);
     return { filename };
+  }
+
+  async getCategoryById(id: number) {
+    const category = await this.prismaService.category.findUnique({
+      where: { id },
+    });
+    if (!category) {
+      throw new NotFoundException('دسته بندی با این شناسه یافت نشد');
+    }
+    return category;
   }
 }
