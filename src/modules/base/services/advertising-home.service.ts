@@ -3,7 +3,10 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { CreateAdvertisingHomeDTO } from '../dtos/advertising-home';
+import {
+  CreateAdvertisingHomeDTO,
+  UpdateAdvertisingHomeDTO,
+} from '../dtos/advertising-home';
 import { User } from '@prisma/client';
 import { PrismaService } from 'src/core/prisma/prisma.service';
 import { CategoryService } from './category.service';
@@ -71,7 +74,7 @@ export class AdvertisingHomeService {
   }
 
   async deleteAdvertisingHomeById(creator: User, id: number) {
-    const advertisingHome = await this.findAdvertisingHomeByIdAndCreator(
+    const advertisingHome = await this._findAdvertisingHomeByIdAndCreator(
       creator.id,
       id,
     );
@@ -91,7 +94,44 @@ export class AdvertisingHomeService {
     return advertisingHome;
   }
 
-  private async findAdvertisingHomeByIdAndCreator(
+  async updateAdvertisingHomeById(
+    creator: User,
+    id: number,
+    dto: UpdateAdvertisingHomeDTO,
+  ) {
+    const advertisingHome = await this._findAdvertisingHomeByIdAndCreator(
+      creator.id,
+      id,
+    );
+
+    if (dto.title) {
+      const isDuplicateByTitle =
+        await this.prismaService.advertisingHome.findFirst({
+          where: { title: dto.title, NOT: { id } },
+        });
+
+      if (isDuplicateByTitle) {
+        throw new ConflictException('عنوان آگهی ملکی تکراری میباشد');
+      }
+    }
+
+    if (dto.categoryId) {
+      const category = await this.categoryService.getCategoryById(
+        dto.categoryId,
+      );
+      dto.categoryId = category.id;
+    } else {
+      dto.categoryId = advertisingHome.categoryId;
+    }
+
+    return this.prismaService.advertisingHome.update({
+      where: { id: advertisingHome.id },
+      data: { ...dto },
+      include: { category: true, creator: true },
+    });
+  }
+
+  private async _findAdvertisingHomeByIdAndCreator(
     creatorId: number,
     advertisingId: number,
   ) {

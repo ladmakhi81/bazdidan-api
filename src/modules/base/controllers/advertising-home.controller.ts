@@ -7,6 +7,7 @@ import {
   HttpStatus,
   Param,
   ParseIntPipe,
+  Patch,
   Post,
   Req,
 } from '@nestjs/common';
@@ -21,6 +22,7 @@ import { Authentication } from 'src/core/decorators/auth.decorator';
 import {
   AdvertisingHomeResponseDTO,
   CreateAdvertisingHomeDTO,
+  UpdateAdvertisingHomeDTO,
 } from '../dtos/advertising-home';
 import { AdvertisingHomeService } from '../services/advertising-home.service';
 import { ApiResponseDTO } from 'src/shared/dtos/api-response.dto';
@@ -172,5 +174,39 @@ export class AdvertisingHomeController {
   })
   getAdvertisingHomeById(@Param('id', ParseIntPipe) id: number) {
     return this.advertisingHomeService.getAdvertisingHomeById(id);
+  }
+
+  @Patch(':id')
+  @Authentication()
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Update Advertising Home Successfully',
+    schema: {
+      allOf: [
+        { $ref: getSchemaPath(ApiResponseDTO) },
+        {
+          properties: {
+            data: {
+              $ref: getSchemaPath(AdvertisingHomeResponseDTO),
+            },
+          },
+        },
+      ],
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'No Advertising Home Exist With This Id And Creator',
+  })
+  updateAdvertisingHomeById(
+    @Param('id', ParseIntPipe) id: number,
+    @Req() request: Express.Request,
+    @Body() dto: UpdateAdvertisingHomeDTO,
+  ) {
+    return this.advertisingHomeService.updateAdvertisingHomeById(
+      request.user,
+      id,
+      dto,
+    );
   }
 }
