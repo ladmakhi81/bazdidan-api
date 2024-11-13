@@ -8,7 +8,12 @@ import {
   Req,
 } from '@nestjs/common';
 import { AuthService } from '../services/auth.service';
-import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiExtraModels,
+  ApiResponse,
+  ApiTags,
+  getSchemaPath,
+} from '@nestjs/swagger';
 import {
   AuthResponseDTO,
   ForgetPasswordDTO,
@@ -16,6 +21,7 @@ import {
   SignupDTO,
 } from '../dtos/auth';
 import { Authentication } from 'src/core/decorators/auth.decorator';
+import { ApiResponseDTO } from 'src/shared/dtos/api-response.dto';
 
 @Controller('/auth')
 @ApiTags('Authentication')
@@ -24,10 +30,24 @@ export class AuthController {
 
   @Post('signup')
   @HttpCode(HttpStatus.CREATED)
+  @ApiExtraModels(ApiResponseDTO, AuthResponseDTO)
   @ApiResponse({
     status: HttpStatus.CREATED,
     description: 'User Signup Successfully',
-    type: AuthResponseDTO,
+    schema: {
+      allOf: [
+        {
+          $ref: getSchemaPath(ApiResponseDTO),
+        },
+        {
+          properties: {
+            data: {
+              $ref: getSchemaPath(AuthResponseDTO),
+            },
+          },
+        },
+      ],
+    },
   })
   @ApiResponse({
     status: HttpStatus.CONFLICT,
@@ -39,10 +59,24 @@ export class AuthController {
 
   @Post('login')
   @HttpCode(HttpStatus.OK)
+  @ApiExtraModels(ApiResponseDTO, AuthResponseDTO)
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'User Login Successfully',
-    type: AuthResponseDTO,
+    schema: {
+      allOf: [
+        {
+          $ref: getSchemaPath(ApiResponseDTO),
+        },
+        {
+          properties: {
+            data: {
+              $ref: getSchemaPath(AuthResponseDTO),
+            },
+          },
+        },
+      ],
+    },
   })
   @ApiResponse({
     status: HttpStatus.NOT_FOUND,
