@@ -1,6 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { AdvertisingHomeType } from '@prisma/client';
 import {
   IsBoolean,
+  IsEnum,
   IsInt,
   IsNumber,
   IsObject,
@@ -16,7 +18,7 @@ export class UpdateAdvertisingHomeDTO {
   @MinLength(3, {
     message: 'عنوان آگهی ملکی باید حداقل تشکیل شده از ۳ حرف باشد',
   })
-  title: string;
+  title?: string;
 
   @IsOptional()
   @ApiProperty({ required: false })
@@ -24,7 +26,7 @@ export class UpdateAdvertisingHomeDTO {
   @MinLength(8, {
     message: 'توضیحات آگهی ملکی باید حداقل تشکیل شده از 8 حرف باشد',
   })
-  description: string;
+  description?: string;
 
   @IsOptional()
   @ApiProperty({ required: false })
@@ -32,17 +34,17 @@ export class UpdateAdvertisingHomeDTO {
   @MinLength(8, {
     message: 'آدرس آگهی ملکی باید حداقل تشکیل شده از 8 حرف باشد',
   })
-  address: string;
+  address?: string;
 
   @IsOptional()
   @ApiProperty({ required: false })
   @IsBoolean({ message: 'وضعیت آگهی ملکی با فعال یا غیرفعال باید مشخص کنید' })
-  isPublished: boolean;
+  isPublished?: boolean;
 
   @IsOptional()
   @ApiProperty({ required: false })
   @IsInt({ message: 'شناسه دسته بندی باید عدد باشد' })
-  categoryId: number;
+  categoryId?: number;
 
   @IsOptional()
   @ApiProperty({ required: false })
@@ -50,7 +52,7 @@ export class UpdateAdvertisingHomeDTO {
     { allowNaN: false, allowInfinity: false },
     { message: 'طول جغرافیایی باید عدد باشد' },
   )
-  latitude: number;
+  latitude?: number;
 
   @IsOptional()
   @ApiProperty({ required: false })
@@ -58,7 +60,52 @@ export class UpdateAdvertisingHomeDTO {
     { allowNaN: false, allowInfinity: false },
     { message: 'عرض جغرافیایی باید عدد باشد' },
   )
-  longtitude: number;
+  longtitude?: number;
+
+  @IsOptional()
+  @IsInt({ message: 'تعداد اتاق ملک باید عدد باشد' })
+  @ApiProperty({ required: true })
+  roomCount?: number;
+
+  @IsOptional()
+  @IsInt({ message: 'متراژ باید عدد باشد' })
+  @ApiProperty({ required: true })
+  meterage?: number;
+
+  @IsOptional()
+  @IsBoolean({ message: 'مشخص کردن وضعیت آسانسور ملک الزامی میباشد' })
+  @ApiProperty({ required: true })
+  hasElevator?: boolean;
+
+  @IsOptional()
+  @IsBoolean({ message: 'مشخص کردن وضعیت پارکینگ ملک الزامی میباشد' })
+  @ApiProperty({ required: true })
+  hasParking?: boolean;
+
+  @IsOptional()
+  @IsBoolean({ message: 'مشخص کردن وضعیت انباری ملک الزامی میباشد' })
+  @ApiProperty({ required: true })
+  hasStoreRoom?: boolean;
+
+  @IsOptional()
+  @IsBoolean({ message: 'مشخص کردن وضعیت بالکن ملک الزامی میباشد' })
+  @ApiProperty({ required: true })
+  hasBalcony?: boolean;
+
+  @IsOptional()
+  @IsEnum(AdvertisingHomeType, {
+    message: 'مشخص کردن نوع آگهی ملکی الزامی میباشد',
+  })
+  @ApiProperty({ required: true })
+  type?: AdvertisingHomeType;
+
+  @IsOptional()
+  @ApiProperty({ required: true })
+  @IsNumber(
+    { allowNaN: false, allowInfinity: false },
+    { message: 'قیمت ملک باید عدد باشد' },
+  )
+  price?: number;
 
   @IsOptional()
   @ApiProperty({ required: false })

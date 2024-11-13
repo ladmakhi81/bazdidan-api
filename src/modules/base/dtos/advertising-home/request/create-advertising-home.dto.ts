@@ -1,6 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { AdvertisingHomeType } from '@prisma/client';
 import {
   IsBoolean,
+  IsEnum,
   IsInt,
   IsNotEmpty,
   IsNumber,
@@ -60,6 +62,51 @@ export class CreateAdvertisingHomeDTO {
     { message: 'عرض جغرافیایی باید عدد باشد' },
   )
   longtitude: number;
+
+  @IsNotEmpty({ message: 'وارد کردن قیمت پایه این ملک الزامی میباشد' })
+  @ApiProperty({ required: true })
+  @IsNumber(
+    { allowNaN: false, allowInfinity: false },
+    { message: 'قیمت ملک باید عدد باشد' },
+  )
+  price: number;
+
+  @IsNotEmpty({ message: 'وارد کردن تعداد اتاق ملک الزامی میباشد' })
+  @IsInt({ message: 'تعداد اتاق ملک باید عدد باشد' })
+  @ApiProperty({ required: true })
+  roomCount: number;
+
+  @IsNotEmpty({ message: 'وارد کردن متراژ ملک الزامی میباشد' })
+  @IsInt({ message: 'متراژ باید عدد باشد' })
+  @ApiProperty({ required: true })
+  meterage: number;
+
+  @IsNotEmpty({ message: 'مشخص کردن وضعیت آسانسور ملک الزامی میباشد' })
+  @IsBoolean({ message: 'مشخص کردن وضعیت آسانسور ملک الزامی میباشد' })
+  @ApiProperty({ required: true })
+  hasElevator: boolean;
+
+  @IsNotEmpty({ message: 'مشخص کردن وضعیت پارکینگ ملک الزامی میباشد' })
+  @IsBoolean({ message: 'مشخص کردن وضعیت پارکینگ ملک الزامی میباشد' })
+  @ApiProperty({ required: true })
+  hasParking: boolean;
+
+  @IsNotEmpty({ message: 'مشخص کردن وضعیت انباری ملک الزامی میباشد' })
+  @IsBoolean({ message: 'مشخص کردن وضعیت انباری ملک الزامی میباشد' })
+  @ApiProperty({ required: true })
+  hasStoreRoom: boolean;
+
+  @IsNotEmpty({ message: 'مشخص کردن وضعیت بالکن ملک الزامی میباشد' })
+  @IsBoolean({ message: 'مشخص کردن وضعیت بالکن ملک الزامی میباشد' })
+  @ApiProperty({ required: true })
+  hasBalcony: boolean;
+
+  @IsNotEmpty({ message: 'مشخص کردن نوع آگهی ملکی الزامی میباشد' })
+  @IsEnum(AdvertisingHomeType, {
+    message: 'مشخص کردن نوع آگهی ملکی الزامی میباشد',
+  })
+  @ApiProperty({ required: true })
+  type: AdvertisingHomeType;
 
   @IsOptional()
   @ApiProperty({ required: false })

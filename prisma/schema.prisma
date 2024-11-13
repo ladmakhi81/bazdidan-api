@@ -47,23 +47,37 @@ model Category {
   advertisingHomes AdvertisingHome[] @relation("AdvertisingHomes")
 }
 
+enum AdvertisingHomeType {
+  Mortage
+  Buy
+  Rent
+}
+
 model AdvertisingHome {
-  id          Int      @id @default(autoincrement())
-  title       String
-  description String
-  meta        Json
-  address     String
-  media       String[] @default([])
-  tags        String[] @default([])
-  creator     User     @relation(fields: [creatorId], references: [id], name: "AdvertisingHomes")
-  creatorId   Int
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  isPublished Boolean
-  category    Category @relation(fields: [categoryId], references: [id], name: "AdvertisingHomes")
-  categoryId  Int
-  latitude    Float
-  longtitude  Float
+  id           Int                 @id @default(autoincrement())
+  title        String
+  description  String
+  meta         Json
+  address      String
+  media        String[]            @default([])
+  tags         String[]            @default([])
+  creator      User                @relation(fields: [creatorId], references: [id], name: "AdvertisingHomes")
+  creatorId    Int
+  createdAt    DateTime            @default(now())
+  updatedAt    DateTime            @updatedAt
+  isPublished  Boolean
+  category     Category            @relation(fields: [categoryId], references: [id], name: "AdvertisingHomes")
+  categoryId   Int
+  latitude     Float
+  longtitude   Float
+  price        Float
+  roomCount    Int
+  meterage     Int
+  hasElevator  Boolean
+  hasParking   Boolean
+  hasStoreRoom Boolean
+  hasBalcony   Boolean
+  type         AdvertisingHomeType
 }
 
 model Chat {
