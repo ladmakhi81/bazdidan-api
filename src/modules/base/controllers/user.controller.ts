@@ -37,10 +37,24 @@ export class UserController {
 
   @Post('create-user')
   @HttpCode(HttpStatus.CREATED)
+  @ApiExtraModels(ApiResponse, UserResponseDTO)
   @ApiResponse({
     status: HttpStatus.CREATED,
     description: 'User Successfully Created',
-    type: UserResponseDTO,
+    schema: {
+      allOf: [
+        {
+          $ref: getSchemaPath(ApiResponseDTO),
+        },
+        {
+          properties: {
+            data: {
+              $ref: getSchemaPath(UserResponseDTO),
+            },
+          },
+        },
+      ],
+    },
   })
   @ApiResponse({
     status: HttpStatus.CONFLICT,
@@ -60,10 +74,24 @@ export class UserController {
     status: HttpStatus.BAD_REQUEST,
     description: 'User Password is incorrect',
   })
+  @ApiExtraModels(ApiResponseDTO, UserResponseDTO)
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'User Updated Successfully',
-    type: UserResponseDTO,
+    schema: {
+      allOf: [
+        {
+          $ref: getSchemaPath(ApiResponseDTO),
+        },
+        {
+          properties: {
+            data: {
+              $ref: getSchemaPath(UserResponseDTO),
+            },
+          },
+        },
+      ],
+    },
   })
   updateUserById(
     @Param('id', ParseIntPipe) id: number,
@@ -81,7 +109,20 @@ export class UserController {
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'User Deleted Successfully',
-    type: UserResponseDTO,
+    schema: {
+      allOf: [
+        {
+          $ref: getSchemaPath(ApiResponseDTO),
+        },
+        {
+          properties: {
+            data: {
+              $ref: getSchemaPath(UserResponseDTO),
+            },
+          },
+        },
+      ],
+    },
   })
   deleteUserById(@Param('id', ParseIntPipe) id: number) {
     return this.userService.deleteUserById(id);
@@ -133,10 +174,20 @@ export class UserController {
     status: HttpStatus.NOT_FOUND,
     description: 'User Not Found By Provided ID',
   })
+  @ApiExtraModels(ApiResponseDTO, UserDetailedResponseDTO)
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'User Found Successfully',
-    type: UserDetailedResponseDTO,
+    schema: {
+      allOf: [
+        { $ref: getSchemaPath(ApiResponseDTO) },
+        {
+          properties: {
+            data: { $ref: getSchemaPath(UserDetailedResponseDTO) },
+          },
+        },
+      ],
+    },
   })
   getUserProfileById(@Param('id', ParseIntPipe) id: number) {
     return this.userService.getUserProfileById(id);
