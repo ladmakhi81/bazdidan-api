@@ -17,6 +17,7 @@ import {
   ApiBody,
   ApiConsumes,
   ApiExtraModels,
+  ApiQuery,
   ApiResponse,
   ApiTags,
   getSchemaPath,
@@ -69,7 +70,7 @@ export class CategoryController {
     return this.categoryService.createCategory(dto);
   }
 
-  @Get()
+  @Get('/page')
   @ApiExtraModels(ApiResponseDTO, PaginationResponseDTO, CategoryResponseDTO)
   @ApiResponse({
     status: HttpStatus.OK,
@@ -97,6 +98,8 @@ export class CategoryController {
       ],
     },
   })
+  @ApiQuery({ name: 'limit', type: 'number', required: false })
+  @ApiQuery({ name: 'page', type: 'number', required: false })
   @HttpCode(HttpStatus.OK)
   getCategories(@Pagination() { limit, page }: PaginationQuery) {
     return this.categoryService.getCategories(page, limit);

@@ -54,4 +54,15 @@ export class AdvertisingHomeService {
       },
     });
   }
+
+  async getAdvertisingHomesPage(page: number, limit: number) {
+    const count = await this.prismaService.advertisingHome.count();
+    const content = await this.prismaService.advertisingHome.findMany({
+      skip: limit * page,
+      take: limit,
+      include: { category: true, creator: true },
+      orderBy: { createdAt: 'desc' },
+    });
+    return { count, content };
+  }
 }

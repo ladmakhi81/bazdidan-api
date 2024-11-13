@@ -13,6 +13,7 @@ import {
 } from '@nestjs/common';
 import {
   ApiExtraModels,
+  ApiQuery,
   ApiResponse,
   ApiTags,
   getSchemaPath,
@@ -161,6 +162,8 @@ export class UserController {
       ],
     },
   })
+  @ApiQuery({ name: 'limit', type: 'number', required: false })
+  @ApiQuery({ name: 'page', type: 'number', required: false })
   getUsersPage(
     @Query() condition: GetUsersQueryDTO,
     @Pagination() { limit, page }: PaginationQuery,

@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
   HttpStatus,
   Post,
@@ -8,6 +9,7 @@ import {
 } from '@nestjs/common';
 import {
   ApiExtraModels,
+  ApiQuery,
   ApiResponse,
   ApiTags,
   getSchemaPath,
@@ -19,6 +21,9 @@ import {
 } from '../dtos/advertising-home';
 import { AdvertisingHomeService } from '../services/advertising-home.service';
 import { ApiResponseDTO } from 'src/shared/dtos/api-response.dto';
+import { Pagination } from 'src/core/decorators/pagination.decorator';
+import { PaginationQuery } from 'src/shared/types/pagination.type';
+import { PaginationResponseDTO } from 'src/shared/dtos/pagination-response.dto';
 
 @Controller('/advertising-home')
 @ApiTags('Advertising Home')
@@ -60,5 +65,50 @@ export class AdvertisingHomeController {
     @Req() request: Express.Request,
   ) {
     return this.advertisingHomeService.createAdvertisingHome(request.user, dto);
+  }
+
+  @Get('/page')
+  @HttpCode(HttpStatus.OK)
+  @ApiExtraModels(
+    ApiResponseDTO,
+    PaginationResponseDTO,
+    AdvertisingHomeResponseDTO,
+  )
+  @ApiQuery({ name: 'limit', type: 'number', required: false })
+  @ApiQuery({ name: 'page', type: 'number', required: false })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Return All Advertising Homes as Page',
+    schema: {
+      allOf: [
+        {
+          $ref: getSchemaPath(ApiResponseDTO),
+        },
+        {
+          properties: {
+            data: {
+              allOf: [
+                {
+                  $ref: getSchemaPath(PaginationResponseDTO),
+                },
+                {
+                  properties: {
+                    content: {
+                      type: 'array',
+                      items: {
+                        $ref: getSchemaPath(AdvertisingHomeResponseDTO),
+                      },
+                    },
+                  },
+                },
+              ],
+            },
+          },
+        },
+      ],
+    },
+  })
+  getAdvertisingHomesPage(@Pagination() { limit, page }: PaginationQuery) {
+    return this.advertisingHomeService.getAdvertisingHomesPage(page, limit);
   }
 }
