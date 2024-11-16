@@ -1,10 +1,10 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { ApiResponseInterceptor } from './core/interceptors/api-response.interceptor';
+import { ApiResponseInterceptor } from './shared/interceptors/api-response.interceptor';
 import { ConfigService } from '@nestjs/config';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { ApiExceptionFilter } from './core/filters/api-exception.filter';
+import { ApiExceptionFilter } from './shared/filters/api-exception.filter';
 
 const initializeSwagger = (app: INestApplication, isProduction: boolean) => {
   if (isProduction) return;
