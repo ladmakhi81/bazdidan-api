@@ -34,8 +34,9 @@ export class ClientRequestService {
     limit: number,
     searchDto: GetAllRequestsConditionDTO,
   ) {
+    const rowCondition = this._prepareGetAllRequestsCondition(searchDto);
     const content = await this.prismaService.clientRequest.findMany({
-      where: this._prepareGetAllRequestsCondition(searchDto),
+      where: rowCondition,
       include: {
         creator: true,
         result: {
@@ -47,7 +48,9 @@ export class ClientRequestService {
       skip: page * limit,
       take: limit,
     });
-    const count = await this.prismaService.clientRequest.count();
+    const count = await this.prismaService.clientRequest.count({
+      where: rowCondition,
+    });
     return { content, count };
   }
 

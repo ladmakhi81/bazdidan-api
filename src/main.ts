@@ -27,7 +27,11 @@ const configureApplication = (app: INestApplication) => {
   app.setGlobalPrefix('/api');
   app.useGlobalInterceptors(new ApiResponseInterceptor());
   app.useGlobalPipes(
-    new ValidationPipe({ forbidNonWhitelisted: true, stopAtFirstError: true }),
+    new ValidationPipe({
+      forbidNonWhitelisted: true,
+      stopAtFirstError: true,
+      transform: true,
+    }),
   );
   app.useGlobalFilters(new ApiExceptionFilter());
   app.enableCors();

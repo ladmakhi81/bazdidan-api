@@ -4,12 +4,14 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  Param,
   Post,
   Query,
   Req,
 } from '@nestjs/common';
 import {
   ApiExtraModels,
+  ApiParam,
   ApiResponse,
   ApiTags,
   getSchemaPath,
@@ -61,7 +63,7 @@ export class ClientRequestController {
     return this.clientRequestService.createRequest(dto, user);
   }
 
-  @Get()
+  @Get('/:model')
   @Authentication()
   @ApiExtraModels(ApiResponse, ClientRequestDetailResponseDTO)
   @ApiResponse({
@@ -80,13 +82,15 @@ export class ClientRequestController {
       ],
     },
   })
-  getOwnRequests(
+  @ApiParam({ required: true, name: 'model', enum: UserModel })
+  getRequests(
     @Req() { user }: Express.Request,
     @Pagination() { limit, page }: PaginationQuery,
     @Query() query: GetAllRequestsConditionDTO,
+    @Param('model') model: UserModel,
   ) {
     return this.clientRequestService.getAllRequests(page, limit, {
-      userType: UserModel.Client,
+      userType: model,
       id: user.id,
       ...query,
     });

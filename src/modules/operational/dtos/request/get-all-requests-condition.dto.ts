@@ -1,13 +1,14 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { AdvertisingHomeType, UserModel } from '@prisma/client';
+import { Transform } from 'class-transformer';
 
 export class GetAllRequestsConditionDTO {
   userType?: UserModel;
 
   id?: number;
 
-  @ApiProperty({ required: true, enum: AdvertisingHomeType })
-  advertisingHomeType: AdvertisingHomeType;
+  @ApiProperty({ required: false, enum: AdvertisingHomeType })
+  advertisingHomeType?: AdvertisingHomeType;
 
   @ApiProperty({ required: false })
   roomCount?: number;
@@ -28,11 +29,14 @@ export class GetAllRequestsConditionDTO {
   longtitude?: number;
 
   @ApiProperty({ required: false })
+  @Transform(({ value }) => value === 'true')
   hasBalcony?: boolean;
 
   @ApiProperty({ required: false })
+  @Transform(({ value }) => value === 'true')
   hasParking?: boolean;
 
   @ApiProperty({ required: false })
+  @Transform(({ value }) => value === 'true')
   hasElevator?: boolean;
 }
