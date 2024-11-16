@@ -2,10 +2,16 @@ import { Injectable } from '@nestjs/common';
 import { CreateClientRequestDTO, GetAllRequestsConditionDTO } from './dtos';
 import { User, UserModel } from '@prisma/client';
 import { PrismaService } from 'src/shared/prisma/prisma.service';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { CreateClientRequestEvent } from './events';
+import { CREATE_CLIENT_REQUEST_EVENT_KEY } from './event-keys.constant';
 
 @Injectable()
 export class ClientRequestService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly eventEmitter: EventEmitter2,
+  ) {}
 
   async createRequest(dto: CreateClientRequestDTO, user: User) {
     const results = await this._findAdvertisingHomeBySearchOptions(dto);
@@ -14,17 +20,12 @@ export class ClientRequestService {
       include: { creator: true },
     });
     if (results.length > 0) {
-      const response = await Promise.all(
-        results.map((result) =>
-          this.prismaService.clientRequestResult.create({
-            data: {
-              advertisingHomeId: result.id,
-              requestId: request.id,
-            },
-          }),
-        ),
-      );
-      console.log({ response });
+      results.map((result) => {
+        this.eventEmitter.emit(
+          CREATE_CLIENT_REQUEST_EVENT_KEY,
+          new CreateClientRequestEvent(result.id, request.id),
+        );
+      });
     }
     return request;
   }

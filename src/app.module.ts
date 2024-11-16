@@ -7,6 +7,8 @@ import { ClientRequestModule } from './client-request/client-request.module';
 import { PrismaModule } from './shared/prisma/prisma.module';
 import { ConfigModule } from '@nestjs/config';
 import { TokenModule } from './shared/token/token.module';
+import { EventEmitterModule } from '@nestjs/event-emitter';
+import { SseModule } from './shared/sse/sse.module';
 
 @Module({
   imports: [
@@ -18,6 +20,8 @@ import { TokenModule } from './shared/token/token.module';
     PrismaModule,
     ConfigModule.forRoot({ isGlobal: true }),
     TokenModule,
+    EventEmitterModule.forRoot(),
+    SseModule,
   ],
 })
 export class AppModule {}

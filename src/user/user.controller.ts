@@ -10,6 +10,7 @@ import {
   Patch,
   Post,
   Query,
+  Sse,
 } from '@nestjs/common';
 import {
   ApiExtraModels,
@@ -31,11 +32,15 @@ import { Pagination } from 'src/shared/decorators/pagination.decorator';
 import { GetUsersQueryDTO } from './dtos/request/get-users-query.dto';
 import { PaginationQuery } from 'src/shared/types/pagination.type';
 import { Authentication } from 'src/shared/decorators/auth.decorator';
+import { SseService } from 'src/shared/sse/sse.service';
 
 @Controller('user')
 @ApiTags('Users')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly sseService: SseService,
+  ) {}
 
   @Post('create-user')
   @HttpCode(HttpStatus.CREATED)
@@ -199,5 +204,10 @@ export class UserController {
   })
   getUserProfileById(@Param('id', ParseIntPipe) id: number) {
     return this.userService.getUserProfileById(id);
+  }
+
+  @Sse('notification')
+  connectNotificationChannel() {
+    return this.sseService.getSubject();
   }
 }
