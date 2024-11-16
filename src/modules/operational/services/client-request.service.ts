@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { CreateClientRequestDTO } from '../dtos';
-import { User } from '@prisma/client';
+import { CreateClientRequestDTO, GetAllRequestsConditionDTO } from '../dtos';
+import { User, UserModel } from '@prisma/client';
 import { PrismaService } from 'src/core/prisma/prisma.service';
 
 @Injectable()
@@ -27,6 +27,104 @@ export class ClientRequestService {
       console.log({ response });
     }
     return request;
+  }
+
+  async getAllRequests(
+    page: number,
+    limit: number,
+    searchDto: GetAllRequestsConditionDTO,
+  ) {
+    const content = await this.prismaService.clientRequest.findMany({
+      where: this._prepareGetAllRequestsCondition(searchDto),
+      include: {
+        creator: true,
+        result: {
+          include: {
+            advertisingHome: { include: { creator: true, category: true } },
+          },
+        },
+      },
+      skip: page * limit,
+      take: limit,
+    });
+    const count = await this.prismaService.clientRequest.count();
+    return { content, count };
+  }
+
+  private _prepareGetAllRequestsCondition({
+    id,
+    userType,
+    advertisingHomeType,
+    categoryId,
+    hasBalcony,
+    hasElevator,
+    hasParking,
+    latitude,
+    longtitude,
+    meterage,
+    price,
+    roomCount,
+  }: GetAllRequestsConditionDTO) {
+    const condition: Record<string, any> = {};
+    const advertisingHomeCondition: Record<string, any> = {};
+
+    switch (userType) {
+      case UserModel.Admin:
+        break;
+      case UserModel.Client:
+        condition.creatorId = id;
+        break;
+      case UserModel.EstateCompanyAgent:
+        advertisingHomeCondition.creatorId = id;
+        break;
+    }
+
+    if (advertisingHomeType) {
+      advertisingHomeCondition.type = advertisingHomeType;
+    }
+
+    if (categoryId) {
+      advertisingHomeCondition.categoryId = categoryId;
+    }
+
+    if (latitude) {
+      advertisingHomeCondition.latitude = latitude;
+    }
+
+    if (longtitude) {
+      advertisingHomeCondition.longtitude = longtitude;
+    }
+
+    if (meterage) {
+      advertisingHomeCondition.meterage = meterage;
+    }
+
+    if (price) {
+      advertisingHomeCondition.price = price;
+    }
+
+    if (roomCount) {
+      advertisingHomeCondition.roomCount = roomCount;
+    }
+
+    if (typeof hasBalcony !== typeof undefined) {
+      advertisingHomeCondition.hasBalcony = hasBalcony;
+    }
+
+    if (typeof hasElevator !== typeof undefined) {
+      advertisingHomeCondition.hasElevator = hasElevator;
+    }
+
+    if (typeof hasParking !== typeof undefined) {
+      advertisingHomeCondition.hasParking = hasParking;
+    }
+
+    condition.result = {
+      ...condition.result,
+      some: { advertisingHome: advertisingHomeCondition },
+    };
+
+    return condition;
   }
 
   private _findAdvertisingHomeBySearchOptions({

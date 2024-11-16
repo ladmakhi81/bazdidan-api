@@ -1,9 +1,11 @@
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
   HttpStatus,
   Post,
+  Query,
   Req,
 } from '@nestjs/common';
 import {
@@ -14,8 +16,16 @@ import {
 } from '@nestjs/swagger';
 import { ClientRequestService } from '../services/client-request.service';
 import { Authentication } from 'src/core/decorators/auth.decorator';
-import { ClientRequestResponseDTO, CreateClientRequestDTO } from '../dtos';
+import {
+  ClientRequestResponseDTO,
+  CreateClientRequestDTO,
+  GetAllRequestsConditionDTO,
+} from '../dtos';
 import { ApiResponseDTO } from 'src/shared/dtos/api-response.dto';
+import { Pagination } from 'src/core/decorators/pagination.decorator';
+import { PaginationQuery } from 'src/shared/types/pagination.type';
+import { UserModel } from '@prisma/client';
+import { ClientRequestDetailResponseDTO } from '../dtos/response/client-request-detail-response.dto';
 
 @Controller('/client-request')
 @ApiTags('Client Request')
@@ -49,5 +59,36 @@ export class ClientRequestController {
     @Req() { user }: Express.Request,
   ) {
     return this.clientRequestService.createRequest(dto, user);
+  }
+
+  @Get()
+  @Authentication()
+  @ApiExtraModels(ApiResponse, ClientRequestDetailResponseDTO)
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Return Lists Of Requests',
+    schema: {
+      allOf: [
+        { $ref: getSchemaPath(ApiResponse) },
+        {
+          properties: {
+            data: {
+              $ref: getSchemaPath(ClientRequestDetailResponseDTO),
+            },
+          },
+        },
+      ],
+    },
+  })
+  getOwnRequests(
+    @Req() { user }: Express.Request,
+    @Pagination() { limit, page }: PaginationQuery,
+    @Query() query: GetAllRequestsConditionDTO,
+  ) {
+    return this.clientRequestService.getAllRequests(page, limit, {
+      userType: UserModel.Client,
+      id: user.id,
+      ...query,
+    });
   }
 }
