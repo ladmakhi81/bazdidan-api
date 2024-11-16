@@ -23,11 +23,14 @@ export class ClientRequestResultService {
         advertisingHomeId,
       },
       include: {
-        advertisingHome: true,
+        advertisingHome: { include: { creator: true } },
         request: { include: { creator: true } },
       },
     });
 
-    this.sseService.sendEvent(result);
+    this.sseService.sendEvent({
+      ...result,
+      user: result.advertisingHome.creator,
+    });
   }
 }
