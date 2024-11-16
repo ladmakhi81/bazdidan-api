@@ -30,6 +30,7 @@ model User {
   createdAt                DateTime          @default(now())
   updatedAt                DateTime          @updatedAt
   refreshTokens            RefreshToken[]    @relation("RefreshTokens")
+  clientRequestCreated     ClientRequest[]   @relation("ClientRequestCreator")
 }
 
 model RefreshToken {
@@ -54,19 +55,19 @@ enum AdvertisingHomeType {
 }
 
 model AdvertisingHome {
-  id           Int                 @id @default(autoincrement())
+  id           Int                   @id @default(autoincrement())
   title        String
   description  String
   meta         Json
   address      String
-  media        String[]            @default([])
-  tags         String[]            @default([])
-  creator      User                @relation(fields: [creatorId], references: [id], name: "AdvertisingHomes")
+  media        String[]              @default([])
+  tags         String[]              @default([])
+  creator      User                  @relation(fields: [creatorId], references: [id], name: "AdvertisingHomes")
   creatorId    Int
-  createdAt    DateTime            @default(now())
-  updatedAt    DateTime            @updatedAt
+  createdAt    DateTime              @default(now())
+  updatedAt    DateTime              @updatedAt
   isPublished  Boolean
-  category     Category            @relation(fields: [categoryId], references: [id], name: "AdvertisingHomes")
+  category     Category              @relation(fields: [categoryId], references: [id], name: "AdvertisingHomes")
   categoryId   Int
   latitude     Float
   longtitude   Float
@@ -78,6 +79,7 @@ model AdvertisingHome {
   hasStoreRoom Boolean
   hasBalcony   Boolean
   type         AdvertisingHomeType
+  requests     ClientRequestResult[] @relation("AdvertisingHomeRequest")
 }
 
 model Chat {
@@ -96,4 +98,23 @@ model ChatMessage {
   repliedMessage       ChatMessage? @relation("RepliedMessage")
   repliedMessageId     Int?         @unique
   parentRepliedMessage ChatMessage? @relation("RepliedMessage", fields: [repliedMessageId], references: [id])
+}
+
+model ClientRequest {
+  id           Int                   @id @default(autoincrement())
+  searchOption Json
+  creatorId    Int
+  creator      User                  @relation(fields: [creatorId], references: [id], name: "ClientRequestCreator")
+  result       ClientRequestResult[] @relation("SendedClientRequestResult")
+  createdAt    DateTime              @default(now())
+}
+
+model ClientRequestResult {
+  requestId Int
+  request   ClientRequest @relation(fields: [requestId], references: [id], name: "SendedClientRequestResult")
+
+  advertisingHomeId Int
+  advertisingHome   AdvertisingHome @relation(fields: [advertisingHomeId], references: [id], name: "AdvertisingHomeRequest")
+
+  @@id([requestId, advertisingHomeId])
 }
