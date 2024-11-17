@@ -31,6 +31,8 @@ model User {
   updatedAt                DateTime          @updatedAt
   refreshTokens            RefreshToken[]    @relation("RefreshTokens")
   clientRequestCreated     ClientRequest[]   @relation("ClientRequestCreator")
+  chatRoomsAsFirstUser     Chat[]            @relation("ChatRoomAsFirstUser")
+  chatRoomAsSecondUser     Chat[]            @relation("ChatRoomAsSecondUser")
 }
 
 model RefreshToken {
@@ -80,10 +82,22 @@ model AdvertisingHome {
   hasBalcony   Boolean
   type         AdvertisingHomeType
   requests     ClientRequestResult[] @relation("AdvertisingHomeRequest")
+  chats        Chat[]                @relation("AdvertisingRoomChat")
 }
 
 model Chat {
-  id Int @id @default(autoincrement())
+  id       Int    @id @default(autoincrement())
+  roomName String @unique
+
+  firstUserId Int
+  firstUser   User @relation(fields: [firstUserId], references: [id], name: "ChatRoomAsFirstUser")
+
+  secondUserId Int
+  secondUser   User @relation(fields: [secondUserId], references: [id], name: "ChatRoomAsSecondUser")
+
+  advertisingHomeId Int
+  advertisingHome   AdvertisingHome @relation(fields: [advertisingHomeId], references: [id], name: "AdvertisingRoomChat")
+  messages          ChatMessage[]   @relation("ChatMessages")
 }
 
 model ChatMessage {
@@ -98,6 +112,9 @@ model ChatMessage {
   repliedMessage       ChatMessage? @relation("RepliedMessage")
   repliedMessageId     Int?         @unique
   parentRepliedMessage ChatMessage? @relation("RepliedMessage", fields: [repliedMessageId], references: [id])
+
+  chatId Int
+  chat   Chat @relation(fields: [chatId], references: [id], name: "ChatMessages")
 }
 
 model ClientRequest {

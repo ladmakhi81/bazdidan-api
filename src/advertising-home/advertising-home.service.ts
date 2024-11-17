@@ -97,9 +97,12 @@ export class AdvertisingHomeService {
     });
   }
 
-  async getAdvertisingHomeById(id: number) {
+  async getAdvertisingHomeById(id: number, withDetails: boolean = true) {
     const advertisingHome = await this.prismaService.advertisingHome.findUnique(
-      { where: { id }, include: { category: true, creator: true } },
+      {
+        where: { id },
+        include: withDetails ? { category: true, creator: true } : {},
+      },
     );
     if (!advertisingHome) {
       throw new NotFoundException('آگهی ملکی با این شناسه یافت نشد');

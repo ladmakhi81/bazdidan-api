@@ -9,6 +9,7 @@ import { ConfigModule } from '@nestjs/config';
 import { TokenModule } from './shared/token/token.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { SseModule } from './shared/sse/sse.module';
+import { ChatModule } from './chat/chat.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { SseModule } from './shared/sse/sse.module';
     TokenModule,
     EventEmitterModule.forRoot(),
     SseModule,
+    ChatModule,
   ],
 })
 export class AppModule {}

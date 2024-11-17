@@ -8,5 +8,6 @@ import { UserModule } from 'src/user/user.module';
   imports: [CategoryModule, UserModule],
   controllers: [AdvertisingHomeController],
   providers: [AdvertisingHomeService],
+  exports: [AdvertisingHomeService],
 })
 export class AdvertisingHomeModule {}

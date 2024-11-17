@@ -86,14 +86,16 @@ export class UserService {
     return this.prismaService.user.delete({ where: { id } });
   }
 
-  async getUserProfileById(id: number) {
+  async getUserProfileById(id: number, withDetails: boolean = true) {
     const user = await this.prismaService.user.findUnique({
       where: { id },
-      include: {
-        sendMessages: true,
-        receivedMessages: true,
-        advertisingHomes: true,
-      },
+      include: withDetails
+        ? {
+            sendMessages: true,
+            receivedMessages: true,
+            advertisingHomes: true,
+          }
+        : {},
     });
     if (!user) {
       throw new NotFoundException('کاربر یافت نشد');
