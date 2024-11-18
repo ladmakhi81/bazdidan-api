@@ -7,17 +7,23 @@ import { CreateCategoryDTO, UpdateCategoryDTO } from './dtos';
 import { PrismaService } from 'src/shared/prisma/prisma.service';
 import { Jimp } from 'jimp';
 import * as path from 'path';
+import { I18nService } from 'nestjs-i18n';
 
 @Injectable()
 export class CategoryService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly i18n: I18nService,
+  ) {}
 
   async createCategory({ image, name }: CreateCategoryDTO) {
     const isDuplicateByName = await this.prismaService.category.findUnique({
       where: { name },
     });
     if (isDuplicateByName) {
-      throw new ConflictException('نام دسته بندی تکراری میباشد');
+      throw new ConflictException(
+        this.i18n.t('messages.errors.categories.duplicate_name'),
+      );
     }
     return this.prismaService.category.create({
       data: {
@@ -51,7 +57,9 @@ export class CategoryService {
         },
       });
       if (isDuplicateName) {
-        throw new ConflictException('نام دسته بندی تکراری میباشد');
+        throw new ConflictException(
+          this.i18n.t('messages.errors.categories.duplicate_name'),
+        );
       }
     }
     return this.prismaService.category.update({
@@ -81,7 +89,9 @@ export class CategoryService {
       where: { id },
     });
     if (!category) {
-      throw new NotFoundException('دسته بندی با این شناسه یافت نشد');
+      throw new NotFoundException(
+        this.i18n.t('messages.errors.categories.not_found_id'),
+      );
     }
     return category;
   }

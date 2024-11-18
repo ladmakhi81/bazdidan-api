@@ -29,8 +29,11 @@ export class ClientRequestResultService {
     });
 
     this.sseService.sendEvent({
-      ...result,
-      user: result.advertisingHome.creator,
+      event: 'NEW_CLIENT_REQUEST',
+      data: {
+        ...result,
+        user: result.advertisingHome.creator,
+      },
     });
   }
 }

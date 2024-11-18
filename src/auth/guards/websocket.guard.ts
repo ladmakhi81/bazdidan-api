@@ -4,6 +4,7 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
+import { I18nService } from 'nestjs-i18n';
 import { Socket } from 'socket.io';
 import { TokenService } from 'src/shared/token/token.service';
 import { VerifiedToken } from 'src/shared/types/token.type';
@@ -14,6 +15,7 @@ export class WebsocketGuard implements CanActivate {
   constructor(
     private readonly tokenService: TokenService,
     private readonly userService: UserService,
+    private readonly i18n: I18nService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -21,14 +23,18 @@ export class WebsocketGuard implements CanActivate {
     const token = client.handshake?.auth?.token ?? '';
 
     if (!token) {
-      throw new UnauthorizedException('ابتدا وارد حساب کاربری خود شوید');
+      throw new UnauthorizedException(
+        this.i18n.t('messages.errors.auth.login_message'),
+      );
     }
 
     const verifiedToken: VerifiedToken =
       await this.tokenService.verifyToken(token);
 
     if (!verifiedToken) {
-      throw new UnauthorizedException('توکن کاربر نامعتبر میباشد');
+      throw new UnauthorizedException(
+        this.i18n.t('messages.errors.auth.token_expired'),
+      );
     }
     client.authUser = await this.userService.getUserProfileById(
       verifiedToken.userId,

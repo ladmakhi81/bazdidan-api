@@ -1,0 +1,27 @@
+{
+    "errors": {
+        "users": {
+            "duplicate_phone_number": "Entered Phone Number Is Duplicated",
+            "not_found_id": "User Not Exist By This Id",
+            "password_invalid": "Entered Password Is Wrong",
+            "phone_password_invalid": "Phone Number Or Password Is Wrong"
+        },
+        "chat": {
+            "not_found": "Chat Room Is Not Found",
+            "not_found_message": "No Message Exist With This Id"
+        },
+        "categories": {
+            "duplicate_name": "Entered Category Name Is Duplicated",
+            "not_found_id": "No Category Exist With This ID"
+        },
+        "advertising_homes": {
+            "duplicate_title": "Entered Title For Advertising Home Is Duplicated",
+            "not_found_id": "No Advertising Home Exist With This ID",
+            "not_found_id_and_creator": "No Advertising Home Exist With This ID And Creator"
+        },
+        "auth": {
+            "login_message": "ابتدا وارد حساب کاربری خود شوید",
+            "token_expired": "توکن کاربر نامعتبر میباشد"
+        }
+    }
+}

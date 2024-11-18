@@ -4,6 +4,7 @@ import { CreateChatRoomDTO, CreateMessageDTO } from './dtos';
 import { User } from '@prisma/client';
 import { UserService } from 'src/user/user.service';
 import { AdvertisingHomeService } from 'src/advertising-home/advertising-home.service';
+import { I18nService } from 'nestjs-i18n';
 
 @Injectable()
 export class ChatService {
@@ -11,6 +12,7 @@ export class ChatService {
     private readonly prismaService: PrismaService,
     private readonly userService: UserService,
     private readonly advertisingHomeService: AdvertisingHomeService,
+    private readonly i18n: I18nService,
   ) {}
 
   async getMessagesByAdvertisingHomeId(
@@ -116,7 +118,9 @@ export class ChatService {
   async findByChatId(id: number) {
     const chat = await this.prismaService.chat.findUnique({ where: { id } });
     if (!chat) {
-      throw new NotFoundException('گروه گفتگویی یافت نشد');
+      throw new NotFoundException(
+        this.i18n.t('messages.errors.chat.not_found'),
+      );
     }
     return chat;
   }
@@ -126,7 +130,9 @@ export class ChatService {
       where: { id },
     });
     if (!message) {
-      throw new NotFoundException('پیامی با این شناسه یافت نشد');
+      throw new NotFoundException(
+        this.i18n.t('messages.errors.chat.not_found_message'),
+      );
     }
     return message;
   }

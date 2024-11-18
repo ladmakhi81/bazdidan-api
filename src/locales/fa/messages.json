@@ -1,0 +1,27 @@
+{
+    "errors": {
+        "users": {
+            "duplicate_phone_number": "شماره تماس وارد شده تکراری میباشد",
+            "not_found_id": "کاربری با این شناسه یافت نشد",
+            "password_invalid": "گذرواژه وارد شده نادرست میباشد",
+            "phone_password_invalid": "شماره تماس یا گذرواژه نادرست میباشد"
+        },
+        "chat": {
+            "not_found": "گروه گفتگویی یافت نشد",
+            "not_found_message": "پیامی با این شناسه یافت نشد"
+        },
+        "categories": {
+            "duplicate_name": "نام دسته بندی وارد شده تکراری میباشد",
+            "not_found_id": "دسته بندی با این شناسه وارد شده یافت نشد"
+        },
+        "advertising_homes": {
+            "duplicate_title": "عنوان آگهی ملکی تکراری میباشد",
+            "not_found_id": "آگهی ملکی با این شناسه یافت نشد",
+            "not_found_id_and_creator": "آگهی ملکی با این شناسه و سازنده یافت نشد"
+        },
+        "auth": {
+            "login_message": "First Login To Your User Account",
+            "token_expired": "Your Token Is Expired"
+        }
+    }
+}

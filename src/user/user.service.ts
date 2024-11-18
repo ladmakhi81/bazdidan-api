@@ -9,10 +9,14 @@ import { CreateUserDTO, UpdateUserByIdDTO } from './dtos';
 import { GetUsersQueryDTO } from './dtos/request/get-users-query.dto';
 import * as bcrypt from 'bcrypt';
 import { UserModel } from '@prisma/client';
+import { I18n, I18nService } from 'nestjs-i18n';
 
 @Injectable()
 export class UserService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    @I18n() private readonly i18n: I18nService,
+  ) {}
 
   async createUser(dto: CreateUserDTO) {
     const {
@@ -27,7 +31,9 @@ export class UserService {
     } = dto;
     const isDuplicatedByPhone = await this._findByPhoneNumber(phone);
     if (isDuplicatedByPhone) {
-      throw new ConflictException('شماره تماس تکراری میباشد');
+      throw new ConflictException(
+        this.i18n.t('messages.errors.users.duplicate_phone_number'),
+      );
     }
     const passwordHashed = await this._hashPassword(password);
     const user = await this.prismaService.user.create({
@@ -49,7 +55,9 @@ export class UserService {
   async updateUserById(id: number, dto: UpdateUserByIdDTO) {
     const user = await this._findUserById(id);
     if (!user) {
-      throw new NotFoundException('کاربر یافت نشد');
+      throw new NotFoundException(
+        this.i18n.t('messages.errors.users.not_found_id'),
+      );
     }
     if (dto.password) {
       const isPasswordCorrect = await this._checkIsPasswordCorrect(
@@ -60,7 +68,9 @@ export class UserService {
         dto.password = await this._hashPassword(dto.password);
         delete dto.currentPassword;
       } else {
-        throw new BadRequestException('گذرواژه وارد شده نادرست میباشد');
+        throw new BadRequestException(
+          this.i18n.t('messages.errors.users.password_invalid'),
+        );
       }
     } else {
       delete dto.password;
@@ -81,7 +91,9 @@ export class UserService {
   async deleteUserById(id: number) {
     const user = await this._findUserById(id);
     if (!user) {
-      throw new NotFoundException('کاربر یافت نشد');
+      throw new NotFoundException(
+        this.i18n.t('messages.errors.users.not_found_id'),
+      );
     }
     return this.prismaService.user.delete({ where: { id } });
   }
@@ -98,7 +110,9 @@ export class UserService {
         : {},
     });
     if (!user) {
-      throw new NotFoundException('کاربر یافت نشد');
+      throw new NotFoundException(
+        this.i18n.t('messages.errors.users.not_found_id'),
+      );
     }
     return user;
   }
@@ -121,7 +135,9 @@ export class UserService {
       user.password,
     );
     if (!isPasswordCorrect) {
-      throw new NotFoundException('شماره تماس یا گذرواژه کاربر نادرست میباشد');
+      throw new NotFoundException(
+        this.i18n.t('messages.errors.users.phone_password_invalid'),
+      );
     }
     return user;
   }

@@ -10,6 +10,8 @@ import { TokenModule } from './shared/token/token.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { SseModule } from './shared/sse/sse.module';
 import { ChatModule } from './chat/chat.module';
+import { HeaderResolver, I18nJsonLoader, I18nModule } from 'nestjs-i18n';
+import * as path from 'path';
 
 @Module({
   imports: [
@@ -24,6 +26,15 @@ import { ChatModule } from './chat/chat.module';
     EventEmitterModule.forRoot(),
     SseModule,
     ChatModule,
+    I18nModule.forRoot({
+      loader: I18nJsonLoader,
+      fallbackLanguage: 'fa',
+      loaderOptions: {
+        path: path.join(__dirname, '/locales/'),
+        watch: true,
+      },
+      resolvers: [new HeaderResolver(['x-lang'])],
+    }),
   ],
 })
 export class AppModule {}

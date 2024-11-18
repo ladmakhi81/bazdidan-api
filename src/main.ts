@@ -18,6 +18,7 @@ const initializeSwagger = (app: INestApplication, isProduction: boolean) => {
       name: 'Authorization',
       bearerFormat: 'bearer',
     })
+    .addGlobalParameters({ in: 'header', name: 'x-lang' })
     .build();
   const document = SwaggerModule.createDocument(app, swaggerDocumentOption);
   SwaggerModule.setup('/document', app, document);

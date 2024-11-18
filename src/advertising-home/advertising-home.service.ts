@@ -7,12 +7,14 @@ import { User } from '@prisma/client';
 import { CategoryService } from 'src/category/category.service';
 import { PrismaService } from 'src/shared/prisma/prisma.service';
 import { CreateAdvertisingHomeDTO, UpdateAdvertisingHomeDTO } from './dtos';
+import { I18nService } from 'nestjs-i18n';
 
 @Injectable()
 export class AdvertisingHomeService {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly categoryService: CategoryService,
+    private readonly i18n: I18nService,
   ) {}
 
   async createAdvertisingHome(
@@ -43,7 +45,9 @@ export class AdvertisingHomeService {
         where: { title },
       });
     if (isDuplicateByTitle) {
-      throw new ConflictException('عنوان آگهی ملکی تکراری میباشد');
+      throw new ConflictException(
+        this.i18n.t('messages.errors.advertising_homes.duplicate_title'),
+      );
     }
     const category = await this.categoryService.getCategoryById(categoryId);
     return this.prismaService.advertisingHome.create({
@@ -105,7 +109,9 @@ export class AdvertisingHomeService {
       },
     );
     if (!advertisingHome) {
-      throw new NotFoundException('آگهی ملکی با این شناسه یافت نشد');
+      throw new NotFoundException(
+        this.i18n.t('messages.errors.advertising_homes.not_found_id'),
+      );
     }
     return advertisingHome;
   }
@@ -127,7 +133,9 @@ export class AdvertisingHomeService {
         });
 
       if (isDuplicateByTitle) {
-        throw new ConflictException('عنوان آگهی ملکی تکراری میباشد');
+        throw new ConflictException(
+          this.i18n.t('messages.errors.advertising_homes.duplicate_title'),
+        );
       }
     }
 
@@ -159,7 +167,11 @@ export class AdvertisingHomeService {
     });
 
     if (!advertisingHome) {
-      throw new NotFoundException('آگهی شغلی با این شناسه و سازنده یافت نشد');
+      throw new NotFoundException(
+        this.i18n.t(
+          'messages.errors.advertising_homes.not_found_id_and_creator',
+        ),
+      );
     }
     return advertisingHome;
   }
