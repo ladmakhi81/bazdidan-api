@@ -9,3 +9,25 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=bazdidan_db
+    networks:
+      - app-network 
+  app:
+    container_name: app
+    build: 
+      context: .
+      dockerfile: dockerfile
+    ports:
+      - 8080:8080
+    depends_on:
+      - db
+    networks:
+      - app-network 
+    environment:
+      - APP_PORT=8080
+      - SECRET_KEY=xxx
+      - NODE_ENV=production
+      - DATABASE_URL=postgres://postgres:postgres@db:5432/bazdidan_db
+    restart: on-failure
+networks:
+  app-network:
+    driver: bridge
