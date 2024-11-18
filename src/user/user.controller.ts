@@ -11,8 +11,12 @@ import {
   Post,
   Query,
   Sse,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
 import {
+  ApiBody,
+  ApiConsumes,
   ApiExtraModels,
   ApiQuery,
   ApiResponse,
@@ -23,6 +27,7 @@ import { UserService } from './user.service';
 import {
   CreateUserDTO,
   UpdateUserByIdDTO,
+  UploadProfileFileResponseDTO,
   UserDetailedResponseDTO,
   UserResponseDTO,
 } from './dtos';
@@ -33,6 +38,7 @@ import { GetUsersQueryDTO } from './dtos/request/get-users-query.dto';
 import { PaginationQuery } from 'src/shared/types/pagination.type';
 import { Authentication } from 'src/shared/decorators/auth.decorator';
 import { SseService } from 'src/shared/sse/sse.service';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('user')
 @ApiTags('Users')
@@ -209,5 +215,42 @@ export class UserController {
   @Sse('notification')
   connectNotificationChannel() {
     return this.sseService.getSubject();
+  }
+
+  @Post('upload-profile')
+  @Authentication()
+  @HttpCode(HttpStatus.OK)
+  @ApiExtraModels(ApiResponseDTO, UploadProfileFileResponseDTO)
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Image Uploaded Successfully',
+    schema: {
+      allOf: [
+        { $ref: getSchemaPath(ApiResponseDTO) },
+        {
+          properties: {
+            data: {
+              $ref: getSchemaPath(UploadProfileFileResponseDTO),
+            },
+          },
+        },
+      ],
+    },
+  })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        image: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
+  @UseInterceptors(FileInterceptor('image'))
+  uploadProfileImage(@UploadedFile() file: Express.Multer.File) {
+    return this.userService.uploadProfileImage(file);
   }
 }

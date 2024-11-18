@@ -70,15 +70,7 @@ export class CategoryService {
 
   async uploadCategoryImage(file: Express.Multer.File) {
     const filename = `/images/${new Date().getTime()}-${Math.floor(Math.random() * 100000000)}${file.originalname}`;
-    const filePathURL = path.join(
-      __dirname,
-      '..',
-      '..',
-      '..',
-      '..',
-      'public',
-      filename,
-    );
+    const filePathURL = path.join(__dirname, '..', '..', 'public', filename);
     const loadedFile = await Jimp.read(file.buffer);
     await loadedFile.resize({ h: 200, w: 200 }).write(filePathURL as any);
     return { filename };

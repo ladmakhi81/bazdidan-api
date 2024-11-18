@@ -8,6 +8,8 @@ import { CategoryService } from 'src/category/category.service';
 import { PrismaService } from 'src/shared/prisma/prisma.service';
 import { CreateAdvertisingHomeDTO, UpdateAdvertisingHomeDTO } from './dtos';
 import { I18nService } from 'nestjs-i18n';
+import * as path from 'path';
+import { createWriteStream } from 'fs';
 
 @Injectable()
 export class AdvertisingHomeService {
@@ -77,6 +79,20 @@ export class AdvertisingHomeService {
         category: true,
       },
     });
+  }
+
+  uploadMedia(file: Express.Multer.File) {
+    const fileName = `${new Date().getTime()}-${Math.floor(Math.random() * 100000)}${path.extname(file.originalname)}`;
+    const stream = createWriteStream(
+      path.join(__dirname, '..', '..', 'public', 'images', fileName),
+    );
+    stream.write(file.buffer);
+    stream.end();
+    return { fileName };
+  }
+
+  uploadMedias(files: Express.Multer.File[]) {
+    return Promise.all(files.map(this.uploadMedia));
   }
 
   async getAdvertisingHomesPage(page: number, limit: number) {

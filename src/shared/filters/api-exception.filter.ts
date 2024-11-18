@@ -14,7 +14,7 @@ export class ApiExceptionFilter implements ExceptionFilter {
     const exceptionResponse = exception?.getResponse?.() as Record<string, any>;
     const statusCode =
       exception?.getStatus?.() || HttpStatus.INTERNAL_SERVER_ERROR;
-
+    console.log(exception);
     response.status(statusCode).json({
       error: true,
       statusCode,

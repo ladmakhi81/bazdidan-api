@@ -10,6 +10,8 @@ import { GetUsersQueryDTO } from './dtos/request/get-users-query.dto';
 import * as bcrypt from 'bcrypt';
 import { UserModel } from '@prisma/client';
 import { I18n, I18nService } from 'nestjs-i18n';
+import * as path from 'path';
+import { createWriteStream } from 'fs';
 
 @Injectable()
 export class UserService {
@@ -50,6 +52,16 @@ export class UserService {
       },
     });
     return user;
+  }
+
+  async uploadProfileImage(file: Express.Multer.File) {
+    const fileName = `${new Date().getTime()}-${Math.floor(Math.random() * 10000000)}${path.extname(file.originalname)}`;
+    const stream = createWriteStream(
+      path.join(__dirname, '..', '..', 'public', 'images', fileName),
+    );
+    stream.write(file.buffer);
+    stream.end();
+    return { fileName };
   }
 
   async updateUserById(id: number, dto: UpdateUserByIdDTO) {

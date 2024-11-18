@@ -10,8 +10,12 @@ import {
   Patch,
   Post,
   Req,
+  UploadedFiles,
+  UseInterceptors,
 } from '@nestjs/common';
 import {
+  ApiBody,
+  ApiConsumes,
   ApiExtraModels,
   ApiQuery,
   ApiResponse,
@@ -25,10 +29,12 @@ import {
   AdvertisingHomeResponseDTO,
   CreateAdvertisingHomeDTO,
   UpdateAdvertisingHomeDTO,
+  UploadAdvertisingMediasResponseDTO,
 } from './dtos';
 import { PaginationResponseDTO } from 'src/shared/dtos/pagination-response.dto';
 import { Pagination } from 'src/shared/decorators/pagination.decorator';
 import { PaginationQuery } from 'src/shared/types/pagination.type';
+import { FilesInterceptor } from '@nestjs/platform-express';
 
 @Controller('/advertising-home')
 @ApiTags('Advertising Home')
@@ -36,6 +42,48 @@ export class AdvertisingHomeController {
   constructor(
     private readonly advertisingHomeService: AdvertisingHomeService,
   ) {}
+
+  @Post('upload-medias')
+  @UseInterceptors(FilesInterceptor('medias'))
+  @ApiExtraModels(ApiResponseDTO, UploadAdvertisingMediasResponseDTO)
+  @HttpCode(HttpStatus.OK)
+  @Authentication()
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Medias Uploaded Successfully',
+    schema: {
+      allOf: [
+        {
+          $ref: getSchemaPath(ApiResponseDTO),
+        },
+        {
+          properties: {
+            data: {
+              $ref: getSchemaPath(UploadAdvertisingMediasResponseDTO),
+            },
+          },
+        },
+      ],
+    },
+  })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        medias: {
+          type: 'array', // Define as an array
+          items: {
+            type: 'string',
+            format: 'binary', // Each item is a binary file
+          },
+        },
+      },
+    },
+  })
+  uploadMedias(@UploadedFiles() medias: Express.Multer.File[]) {
+    return this.advertisingHomeService.uploadMedias(medias);
+  }
 
   @Post()
   @Authentication()
